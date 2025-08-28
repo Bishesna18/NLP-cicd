@@ -6,11 +6,3 @@ def test_positive():
 def test_negative():
     assert predict_sentiment("I hate this film!")[0] == 0
 
-def run_all_tests():
-    test_positive()
-    test_negative()
-    print("All tests passed!")
-
-if __name__ == "__main__":
-    run_all_tests()
-

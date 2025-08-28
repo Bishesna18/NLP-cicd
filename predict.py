@@ -1,21 +1,29 @@
-# test_predict.py
-from predict import predict_sentiment
-import numpy as np
+# predict.py
+import joblib
+from typing import List, Union
 
-def test_positive():
-    pred = predict_sentiment("I absolutely loved this movie, it was amazing!")
-    # ensure we got a 0/1 back
-    assert isinstance(pred, np.ndarray)
-    assert pred.shape == (1,)
-    # Expect positive (1)
-    assert pred[0] in (0,1)
-    # If your model is good, this should be positive:
-    assert pred[0] == 1
+MODEL_PATH = "sentiment_model.pkl"
+VECTORIZER_PATH = "tfidf_vectorizer.pkl"
 
-def test_negative():
-    pred = predict_sentiment("This was a horrible film. Boring and badly acted.")
-    assert isinstance(pred, np.ndarray)
-    assert pred.shape == (1,)
-    assert pred[0] in (0,1)
-    # Expect negative (0)
-    assert pred[0] == 0
+def load_model(model_path=MODEL_PATH):
+    return joblib.load(model_path)
+
+def load_vectorizer(vec_path=VECTORIZER_PATH):
+    return joblib.load(vec_path)
+
+def predict_sentiment(texts: Union[str, List[str]]):
+    if isinstance(texts, str):
+        texts = [texts]
+    try:
+        # Try pipeline model
+        model = load_model()
+        return model.predict(texts)
+    except Exception:
+        # Fallback: separate vectorizer + model
+        vectorizer = load_vectorizer()
+        model = load_model()
+        X = vectorizer.transform(texts)
+        return model.predict(X)
+
+if __name__ == "__main__":
+    print(predict_sentiment("I love this movie!"))
