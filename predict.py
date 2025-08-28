@@ -1,17 +1,21 @@
-import joblib
+# test_predict.py
+from predict import predict_sentiment
+import numpy as np
 
-def load_model(model_path='sentiment_model.pkl'):
-    """Load the trained sentiment model"""
-    return joblib.load(model_path)
+def test_positive():
+    pred = predict_sentiment("I absolutely loved this movie, it was amazing!")
+    # ensure we got a 0/1 back
+    assert isinstance(pred, np.ndarray)
+    assert pred.shape == (1,)
+    # Expect positive (1)
+    assert pred[0] in (0,1)
+    # If your model is good, this should be positive:
+    assert pred[0] == 1
 
-def predict_sentiment(text, model_path='sentiment_model.pkl'):
-    """Predict sentiment for a single text"""
-    model = load_model(model_path)
-    return model.predict([text])[0]
-
-# Example usage
-if __name__ == "__main__":
-    sample_text = "I love this movie!"
-    prediction = predict_sentiment(sample_text)
-    print(f"Text: {sample_text}")
-    print(f"Predicted Sentiment: {'positive' if prediction == 1 else 'negative'}")
+def test_negative():
+    pred = predict_sentiment("This was a horrible film. Boring and badly acted.")
+    assert isinstance(pred, np.ndarray)
+    assert pred.shape == (1,)
+    assert pred[0] in (0,1)
+    # Expect negative (0)
+    assert pred[0] == 0
